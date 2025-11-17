@@ -66,12 +66,23 @@ void show_banks(struct Bank banks[], int n) {
         printf("FD: %.2f vs %.2f\n", banks[a].fd, banks[b].fd);
         printf("Save: %.2f vs %.2f\n", banks[a].save, banks[b].save);
         printf("Loan: %.2f vs %.2f\n", banks[a].loan, banks[b].loan);
-    }
+        
+
+   FILE *fp = fopen("history.txt", "a");
+
+fprintf(fp, "%s vs %s\n", banks[a].name, banks[b].name);
+fclose(fp);
+
+    
+}
     
 void risk_calc() {
         int t;
         printf("Types: 1-FD 2-MF 3-Gold 4-Stocks 5-Crypto\nChoose: ");
         scanf("%d", &t);
+        int yrs;
+        printf("years: ");
+        scanf("%d",&yrs);
         
         if (t==1) printf("Low Risk\n");
         else if (t==2) printf("Medium Risk\n");
@@ -83,6 +94,7 @@ void risk_calc() {
 double sip() {
         double monthly, rate, years, r;
         int n;
+        FILE *hf;
         printf("\n--- SIP ---\n");
         
         printf("Monthly amount: "); scanf("%lf", &monthly);
@@ -98,12 +110,16 @@ double sip() {
         for (int i = 0; i < n; i++)
         finalAmt = (finalAmt + monthly) * growth;
     
-    printf("Final SIP = %.2f\n", finalAmt);
-    return finalAmt;
+        printf("Final SIP = %.2f\n", finalAmt);
+        hf = fopen("history.txt","a");
+        fprintf(hf, "SIP: monthly %.2f rate %.2f%% years %.1f final %.2f\n", monthly, rate, years, finalAmt);
+        fclose(hf);
+        return finalAmt;
 }
 
 double swp() {
     double principal, withdrawal, rate, years, r;
+    FILE *hf;
     printf("\n--- SWP ---\n");
     
     printf("Principal: "); scanf("%lf", &principal);
@@ -122,6 +138,9 @@ double swp() {
     }
     
     printf("Remaining balance = %.2f\n", bal);
+    hf = fopen("history.txt","a");
+    fprintf(hf, "SWP: start %.2f withdraw %.2f rate %.2f%% years %.1f remain %.2f\n", principal, withdrawal, rate, years, bal);
+    fclose(hf);
     return bal;
 }
 
@@ -136,11 +155,15 @@ double mypow(double base, int exp) {
 
 void investment_menu(struct Bank banks[], int n) {
     int opt;
+    FILE *hf;
 
     while (1) {
         printf("\n-- Investment Menu --\n");
         printf("1 FD\n2 Saving\n3 Loan\n4 Gold\n5 Stocks\n6 Crypto\n7 SIP/SWP\n8 Back\nChoose: ");
-        scanf("%d", &opt);
+        if((scanf("%d", &opt))!=1){
+            return;
+
+        }
 
         if (opt == 1) {
             int b; double amt, yrs;
@@ -153,6 +176,9 @@ void investment_menu(struct Bank banks[], int n) {
             double result = amt * mypow(1 + banks[b-1].fd/100, y);
 
             printf("FD final = %.2f\n", result);
+            hf = fopen("history.txt","a");
+            fprintf(hf, "FD: bank %s amt %.2f yrs %.1f final %.2f\n", banks[b-1].name, amt, yrs, result); 
+            fclose(hf); 
         }
         else if (opt == 2) {
             int b; double amt, yrs;
@@ -164,38 +190,91 @@ void investment_menu(struct Bank banks[], int n) {
             int y = (int)yrs;
             double result = amt * mypow(1 + banks[b-1].save/100, y);
 
-            printf("Saving final = %.2f\n", result);
-        }
+            printf("Saving final = %.2f", result);
+            hf = fopen("history.txt","a");
+            fprintf(hf, "Saving: bank %s amt %.2f yrs %.1f final %.2f\n", banks[b-1].name, amt, yrs, result);
+            fclose(hf);}
+        
         else if (opt == 3) {
-            printf("Loan calculator simplified.\n");
+            int b; double loanAmt, yrs, monthlyRate, months, emi;
+            show_banks(banks, n);
+            printf("Select bank number: "); scanf("%d", &b);
+            if (b<1||b>n) {
+                 printf("Bad bank\n"); continue; }
+            printf("Enter loan amount: "); 
+            scanf("%lf", &loanAmt);
+            printf("Enter years: "); 
+            scanf("%lf", &yrs);
+            monthlyRate = (banks[b-1].loan/100.0)/12.0;
+            months = yrs * 12.0;
+            emi = (loanAmt * monthlyRate * mypow(1+monthlyRate, months)) / (mypow(1+monthlyRate, months) - 1);
+            printf("Monthly EMI = %.2f\n", emi);
+            hf = fopen("history.txt","a");
+            fprintf(hf, "Loan: bank %s loan %.2f yrs %.1f emi %.2f\n", banks[b-1].name, loanAmt, yrs, emi); 
+            fclose(hf); 
         }
         else if (opt == 4) {
-            double amt, yrs; printf("Amt: "); scanf("%lf", &amt);
+            double amt, yrs,result; printf("Amt: "); scanf("%lf", &amt);
             printf("Years: "); scanf("%lf", &yrs);
-            printf("Gold %.2f\n", amt * mypow(1.08, (int)yrs));
+            result= amt * mypow(1.08, (int)yrs);
+            printf("Gold %.2f\n", result);
+            hf = fopen("history.txt","a");
+            fprintf(hf, "Gold: amt %.2f yrs %.1f final %.2f\n", amt, yrs, result); 
+            fclose(hf); 
         }
         else if (opt == 5) {
-            double amt, yrs; printf("Amt: "); scanf("%lf", &amt);
+            double amt, yrs,result; printf("Amt: "); scanf("%lf", &amt);
             printf("Years: "); scanf("%lf", &yrs);
-            printf("Stocks %.2f\n", amt * mypow(1.14, (int)yrs));
+            result=amt * mypow(1.14, (int)yrs);
+            printf("Stocks %.2f\n",result );
+            hf = fopen("history.txt","a");
+            fprintf(hf, "Stocks: amt %.2f yrs %.1f final %.2f\n", amt, yrs, result); 
+            fclose(hf); 
         }
         else if (opt == 6) {
-            double amt, yrs; printf("Amt: "); scanf("%lf", &amt);
+            double amt, yrs,result; printf("Amt: "); scanf("%lf", &amt);
             printf("Years: "); scanf("%lf", &yrs);
-            printf("Crypto %.2f\n", amt * mypow(1.20, (int)yrs));
+            result=amt * mypow(1.20, (int)yrs);
+            printf("Crypto %.2f\n", result);
+            hf = fopen("history.txt","a");
+            fprintf(hf, "Crypto: amt %.2f yrs %.1f final %.2f\n", amt, yrs, result); 
+            fclose(hf); 
         }
         else if (opt == 7) {
             int s;
             printf("1 SIP\n2 SWP\nChoose: ");
             scanf("%d", &s);
-            if(s==1)sip();
-            else swp();
+            if(s==1)
+            sip();
+            else if(s==2)
+            swp();
         }
         else if (opt == 8)
             return;
     }
 }
+void show_history() {
+    FILE *hf = fopen("history.txt", "r");
+    char line[206];
+    if (fgetc(hf) == EOF ) {
+        printf("No history found.\n");
+        return;
+    }
 
+    printf("\n--- History ---\n");
+
+    while (fgets(line, sizeof(line), hf) != NULL) {
+        printf("%s", line);
+    }
+
+    fclose(hf);
+}
+void clear_history(){
+    FILE *hf = fopen("history.txt", "w");
+fclose(hf);
+printf("History cleared successfully!\n");
+
+}
 
 void mf_main_menu() {
     int c;
@@ -216,14 +295,19 @@ int main() {
     int choice;
     while (1) {
         printf("\n=== MAIN MENU ===\n");
-        printf("1 Show Banks\n2 Compare\n3 Risk\n4 Investment\n5 MF\n6 Exit\nChoose: ");
-        scanf("%d", &choice);
+        printf("1 Show Banks\n2 Compare\n3 Risk\n4 Investment\n5 MF\n6 Show history\n7 Clear history\n8 Exit\nChoose: ");
+        if((scanf("%d", &choice))!=1){
+            return 0;
+        }
 
         if (choice==1) show_banks(banks,20);
         else if (choice==2) compare_banks(banks,20);
         else if (choice==3) risk_calc();
         else if (choice==4) investment_menu(banks,20);
         else if (choice==5) mf_main_menu();
+        else if (choice==6) show_history();
+        else if (choice==7) clear_history();
+
         else break;
     }
     return 0;
