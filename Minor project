@@ -1,0 +1,230 @@
+#include <stdio.h>
+#include <string.h>
+struct Bank {
+    char name[40];
+    float fd;
+    float save;
+    float loan;
+};
+
+void init_banks(struct Bank banks[], int n) {
+    strcpy(banks[0].name, "SBI"); strcpy(banks[1].name, "HDFC"); strcpy(banks[2].name, "ICICI");
+    strcpy(banks[3].name, "Kotak"); strcpy(banks[4].name, "Axis"); strcpy(banks[5].name, "BOB");
+    strcpy(banks[6].name, "PNB"); strcpy(banks[7].name, "Union"); strcpy(banks[8].name, "Canara");
+    strcpy(banks[9].name, "IDBI"); strcpy(banks[10].name, "IndusInd"); strcpy(banks[11].name, "Yes");
+    strcpy(banks[12].name, "BOI"); strcpy(banks[13].name, "Indian"); strcpy(banks[14].name, "Central");
+    strcpy(banks[15].name, "BOM"); strcpy(banks[16].name, "RBL"); strcpy(banks[17].name, "Federal");
+    strcpy(banks[18].name, "IDFC"); strcpy(banks[19].name, "SouthInd");
+    
+    banks[0].fd=6.50; banks[0].save=3.00; banks[0].loan=8.20;
+    banks[1].fd=7.10; banks[1].save=3.25; banks[1].loan=9.10;
+    banks[2].fd=6.85; banks[2].save=3.00; banks[2].loan=8.90;
+    banks[3].fd=7.00; banks[3].save=3.40; banks[3].loan=9.00;
+    banks[4].fd=7.20; banks[4].save=3.50; banks[4].loan=9.30;
+    banks[5].fd=6.60; banks[5].save=2.75; banks[5].loan=8.50;
+    banks[6].fd=6.80; banks[6].save=2.90; banks[6].loan=8.70;
+    banks[7].fd=6.70; banks[7].save=2.85; banks[7].loan=8.60;
+    banks[8].fd=6.55; banks[8].save=2.70; banks[8].loan=8.40;
+    banks[9].fd=6.90; banks[9].save=3.10; banks[9].loan=9.00;
+    banks[10].fd=7.25; banks[10].save=3.55; banks[10].loan=9.50;
+    banks[11].fd=7.30; banks[11].save=3.60; banks[11].loan=9.55;
+    banks[12].fd=6.45; banks[12].save=2.65; banks[12].loan=8.30;
+    banks[13].fd=6.40; banks[13].save=2.60; banks[13].loan=8.20;
+    banks[14].fd=6.35; banks[14].save=2.55; banks[14].loan=8.10;
+    banks[15].fd=6.30; banks[15].save=2.50; banks[15].loan=8.00;
+    banks[16].fd=7.40; banks[16].save=3.65; banks[16].loan=9.70;
+    banks[17].fd=7.15; banks[17].save=3.50; banks[17].loan=9.20;
+    banks[18].fd=6.95; banks[18].save=3.20; banks[18].loan=9.05;
+    banks[19].fd=6.80; banks[19].save=3.00; banks[19].loan=8.80;
+}
+
+void show_banks(struct Bank banks[], int n) {
+    printf("\nNo. Bank     FD Save Loan\n");
+    for (int i = 0; i < n; i++) {
+        printf("%d.  %s    %.2f  %.2f  %.2f\n",
+            i+1, banks[i].name, banks[i].fd, banks[i].save, banks[i].loan);
+        }
+    }
+    
+    
+    void compare_banks(struct Bank banks[], int n) {
+        int a, b;
+        show_banks(banks, n);
+        
+        printf("Enter first bank number: ");
+        scanf("%d", &a);
+        printf("Enter second bank number: ");
+        scanf("%d", &b);
+        
+        if (a < 1 || b < 1 || a > n || b > n) {
+            printf("Invalid numbers\n");
+            return;
+        }
+        
+        a--; b--;
+        printf("\nComparing %s vs %s\n", banks[a].name, banks[b].name);
+        printf("FD: %.2f vs %.2f\n", banks[a].fd, banks[b].fd);
+        printf("Save: %.2f vs %.2f\n", banks[a].save, banks[b].save);
+        printf("Loan: %.2f vs %.2f\n", banks[a].loan, banks[b].loan);
+    }
+    
+void risk_calc() {
+        int t;
+        printf("Types: 1-FD 2-MF 3-Gold 4-Stocks 5-Crypto\nChoose: ");
+        scanf("%d", &t);
+        
+        if (t==1) printf("Low Risk\n");
+        else if (t==2) printf("Medium Risk\n");
+        else if (t==3) printf("Low-Medium\n");
+        else if (t==4) printf("Medium-High\n");
+        else printf("High Risk\n");
+    }
+   
+double sip() {
+        double monthly, rate, years, r;
+        int n;
+        printf("\n--- SIP ---\n");
+        
+        printf("Monthly amount: "); scanf("%lf", &monthly);
+        printf("Rate: "); scanf("%lf", &rate);
+        printf("Years: "); scanf("%lf", &years);
+        
+        r = (rate/100) / 12;
+        n = (int)(years * 12);
+        
+        double finalAmt = 0;
+        double growth = 1 + r;
+        
+        for (int i = 0; i < n; i++)
+        finalAmt = (finalAmt + monthly) * growth;
+    
+    printf("Final SIP = %.2f\n", finalAmt);
+    return finalAmt;
+}
+
+double swp() {
+    double principal, withdrawal, rate, years, r;
+    printf("\n--- SWP ---\n");
+    
+    printf("Principal: "); scanf("%lf", &principal);
+    printf("Withdrawal: "); scanf("%lf", &withdrawal);
+    printf("Rate: "); scanf("%lf", &rate);
+    printf("Years: "); scanf("%lf", &years);
+    
+    r = (rate/100) / 12;
+    int n = (int)(years * 12);
+    
+    double bal = principal;
+    
+    for (int i = 0; i < n; i++) {
+        bal = bal + bal*r - withdrawal;
+        if (bal < 0) { bal = 0; break; }
+    }
+    
+    printf("Remaining balance = %.2f\n", bal);
+    return bal;
+}
+
+double mypow(double base, int exp) {
+        double result = 1.0;
+            for (int i = 0; i < exp; i++) {
+                    result *= base;
+                        }
+                            return result;
+                            }
+
+
+void investment_menu(struct Bank banks[], int n) {
+    int opt;
+
+    while (1) {
+        printf("\n-- Investment Menu --\n");
+        printf("1 FD\n2 Saving\n3 Loan\n4 Gold\n5 Stocks\n6 Crypto\n7 SIP/SWP\n8 Back\nChoose: ");
+        scanf("%d", &opt);
+
+        if (opt == 1) {
+            int b; double amt, yrs;
+            show_banks(banks, n);
+            printf("Bank: "); scanf("%d", &b);
+            printf("Amount: "); scanf("%lf", &amt);
+            printf("Years: "); scanf("%lf", &yrs);
+
+            int y = (int)yrs;
+            double result = amt * mypow(1 + banks[b-1].fd/100, y);
+
+            printf("FD final = %.2f\n", result);
+        }
+        else if (opt == 2) {
+            int b; double amt, yrs;
+            show_banks(banks, n);
+            printf("Bank: "); scanf("%d", &b);
+            printf("Amount: "); scanf("%lf", &amt);
+            printf("Years: "); scanf("%lf", &yrs);
+
+            int y = (int)yrs;
+            double result = amt * mypow(1 + banks[b-1].save/100, y);
+
+            printf("Saving final = %.2f\n", result);
+        }
+        else if (opt == 3) {
+            printf("Loan calculator simplified.\n");
+        }
+        else if (opt == 4) {
+            double amt, yrs; printf("Amt: "); scanf("%lf", &amt);
+            printf("Years: "); scanf("%lf", &yrs);
+            printf("Gold %.2f\n", amt * mypow(1.08, (int)yrs));
+        }
+        else if (opt == 5) {
+            double amt, yrs; printf("Amt: "); scanf("%lf", &amt);
+            printf("Years: "); scanf("%lf", &yrs);
+            printf("Stocks %.2f\n", amt * mypow(1.14, (int)yrs));
+        }
+        else if (opt == 6) {
+            double amt, yrs; printf("Amt: "); scanf("%lf", &amt);
+            printf("Years: "); scanf("%lf", &yrs);
+            printf("Crypto %.2f\n", amt * mypow(1.20, (int)yrs));
+        }
+        else if (opt == 7) {
+            int s;
+            printf("1 SIP\n2 SWP\nChoose: ");
+            scanf("%d", &s);
+            if(s==1)sip();
+            else swp();
+        }
+        else if (opt == 8)
+            return;
+    }
+}
+
+
+void mf_main_menu() {
+    int c;
+    while (1) {
+        printf("\nMF\n1 SIP\n2 SWP\n3 Back\nChoose: ");
+        scanf("%d", &c);
+        if (c==1) sip();
+        else if (c==2) swp();
+        else return;
+    }
+}
+
+
+int main() {
+    struct Bank banks[20];
+    init_banks(banks, 20);
+
+    int choice;
+    while (1) {
+        printf("\n=== MAIN MENU ===\n");
+        printf("1 Show Banks\n2 Compare\n3 Risk\n4 Investment\n5 MF\n6 Exit\nChoose: ");
+        scanf("%d", &choice);
+
+        if (choice==1) show_banks(banks,20);
+        else if (choice==2) compare_banks(banks,20);
+        else if (choice==3) risk_calc();
+        else if (choice==4) investment_menu(banks,20);
+        else if (choice==5) mf_main_menu();
+        else break;
+    }
+    return 0;
+}
